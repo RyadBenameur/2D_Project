@@ -47,7 +47,7 @@ class Player():
         #Running Frames
         for num in range(1,7):
             img_run = pygame.image.load(f"img/player/run{num}.png")
-            img_run = img_run = pygame.transform.scale(img_run, (60,80))
+            img_run = pygame.transform.scale(img_run, (60,80))
             img_run_left = pygame.transform.flip(img_run, True, False)
             self.run_l_frames.append(img_run_left)
             self.run_r_frames.append(img_run)
@@ -97,7 +97,8 @@ class Player():
 
 
         # Animations for Character
-        # Idle Animations
+
+        # Idle Animations for looking right
         if dx == 0 and self.looking is True:
             if self.counter > 20:
                 self.idle_index += 1
@@ -105,9 +106,11 @@ class Player():
                     self.idle_index = 0
                 self.image_idle_right = self.idle_r_frames[self.idle_index]
                 self.counter = 0
+
+        # Idle Animations for looking left
         elif dx == 0 and self.looking is False:
             if self.counter > 20:
-                self.idle_index =+ 1
+                self.idle_index += 1
                 if self.idle_index >= len(self.idle_l_frames):
                     self.idle_index = 0
                 self.image_idle_left = self.idle_l_frames[self.idle_index]
@@ -115,6 +118,7 @@ class Player():
 
         # Running animations
         elif dx > 0:
+            self.idle_index = 0
             if self.counter > 6:
                 self.run_index+= 1
                 if self.run_index >= len(self.run_r_frames):
@@ -122,6 +126,7 @@ class Player():
                 self.image_run_right = self.run_r_frames[self.run_index]
                 self.counter = 0
         elif dx < 0:
+            self.idle_index = 0
             if self.counter > 6:
                 self.run_index+= 1
                 if self.run_index >= len(self.run_l_frames):
