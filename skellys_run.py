@@ -33,8 +33,8 @@ class Player():
         # Storing frames for animation
         self.idle_r_frames = []
         self.idle_l_frames = []
-        self.run_r_frames = []
-        self.run_l_frames = []
+        self.run_r_frame_list = []
+        self.run_l_frame_list = []
 
         # Idle Frames
         for num in range(1,10):
@@ -46,18 +46,18 @@ class Player():
         
         #Running Frames
         for num in range(1,7):
-            img_run = pygame.image.load(f"img/player/run{num}.png")
-            img_run = pygame.transform.scale(img_run, (60,80))
-            img_run_left = pygame.transform.flip(img_run, True, False)
-            self.run_l_frames.append(img_run_left)
-            self.run_r_frames.append(img_run)
+            img_r_run = pygame.image.load(f"img/player/run{num}.png")
+            img_r_run = pygame.transform.scale(img_r_run, (60,80))
+            img_l_run = pygame.transform.flip(img_r_run, True, False)
+            self.run_l_frame_list.append(img_l_run)
+            self.run_r_frame_list.append(img_r_run)
 
 
-        self.image_idle_right = self.idle_r_frames[self.idle_index]
-        self.image_idle_left = self.idle_l_frames[self.idle_index]
-        self.image_run_right = self.run_r_frames[self.run_index]
-        self.image_run_left = self.run_l_frames[self.run_index]
-        self.rect = self.image_idle_right.get_rect()
+        self.frame_idle_right = self.idle_r_frames[self.idle_index]
+        self.frame_idle_left = self.idle_l_frames[self.idle_index]
+        self.image_run_right = self.run_r_frame_list[self.run_index]
+        self.image_run_left = self.run_l_frame_list[self.run_index]
+        self.rect = self.frame_idle_right.get_rect()
         self.rect.x = x
         self.rect.y = y
         self.velocity_y = 0
@@ -104,7 +104,7 @@ class Player():
                 self.idle_index += 1
                 if self.idle_index >= len(self.idle_r_frames):
                     self.idle_index = 0
-                self.image_idle_right = self.idle_r_frames[self.idle_index]
+                self.frame_idle_right = self.idle_r_frames[self.idle_index]
                 self.counter = 0
 
         # Idle Animations for looking left
@@ -113,7 +113,7 @@ class Player():
                 self.idle_index += 1
                 if self.idle_index >= len(self.idle_l_frames):
                     self.idle_index = 0
-                self.image_idle_left = self.idle_l_frames[self.idle_index]
+                self.frame_idle_left = self.idle_l_frames[self.idle_index]
                 self.counter = 0
 
         # Running animations
@@ -121,17 +121,17 @@ class Player():
             self.idle_index = 0
             if self.counter > 6:
                 self.run_index+= 1
-                if self.run_index >= len(self.run_r_frames):
+                if self.run_index >= len(self.run_r_frame_list):
                     self.run_index = 0
-                self.image_run_right = self.run_r_frames[self.run_index]
+                self.image_run_right = self.run_r_frame_list[self.run_index]
                 self.counter = 0
         elif dx < 0:
             self.idle_index = 0
             if self.counter > 6:
                 self.run_index+= 1
-                if self.run_index >= len(self.run_l_frames):
+                if self.run_index >= len(self.run_l_frame_list):
                     self.run_index = 0
-                self.image_run_left = self.run_l_frames[self.run_index]
+                self.image_run_left = self.run_l_frame_list[self.run_index]
                 self.counter = 0           
 
         #Update coords of player on screen
@@ -147,11 +147,11 @@ class Player():
         # Draws player on the screen
         if dx == 0:
             if self.looking is True:
-                self.rect = self.image_idle_right.get_rect(topleft = (self.rect.x,self.rect.y))
-                screen.blit(self.image_idle_right, self.rect)
+                self.rect = self.frame_idle_right.get_rect(topleft = (self.rect.x,self.rect.y))
+                screen.blit(self.frame_idle_right, self.rect)
             else:
-                self.rect = self.image_idle_left.get_rect(topleft = (self.rect.x,self.rect.y))
-                screen.blit(self.image_idle_left, self.rect)
+                self.rect = self.frame_idle_left.get_rect(topleft = (self.rect.x,self.rect.y))
+                screen.blit(self.frame_idle_left, self.rect)
 
         elif dx > 0:
             self.rect = self.image_run_right.get_rect(topleft = (self.rect.x,self.rect.y))
@@ -164,7 +164,7 @@ class Player():
 
 
 # Game Variables
-finn = Player(0,0)
+player = Player(0,0)
 
 # Game Loop
 running = True
@@ -185,7 +185,7 @@ while running:
     screen.blit(s_img, (0,0))
 
     # Animations / Characters    
-    finn.update()
+    player.update()
 
     
     pygame.display.update()
