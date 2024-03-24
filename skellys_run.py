@@ -5,6 +5,8 @@
 import pygame
 from pygame.locals import *
 
+tilesize = 64
+
 # Initalise Pygame
 pygame.init()
 
@@ -76,24 +78,32 @@ class Player():
         press = pygame.key.get_pressed()
         # X Axis Changes
         if press[pygame.K_a]:
-            dx -= 5
+            dx -= 8
             self.looking = False
         if press[pygame.K_d]:
-            dx += 5
+            dx += 8
             self.looking = True
 
         # Y axis Changes
         if press[pygame.K_w] and self.jump == False:
-            self.velocity_y -= 30
+            self.velocity_y -= 40
             self.jump = True
 
-        # Check for collisions
-        
         # Process jump mechanics / gravity
-        self.velocity_y += 1
-        if self.velocity_y > 10:
-            self.velocity_y = 10
-        dy += self.velocity_y 
+
+        self.velocity_y += 1.5
+        if self.velocity_y > 15:
+            self.velocity_y = 15
+        dy += self.velocity_y
+
+
+        # Collisions
+        # if pygame.Rect.colliderect(world.rect):
+        #     pygame.quit()
+
+
+
+
 
 
         # Animations for Character
@@ -134,6 +144,7 @@ class Player():
                 self.image_run_left = self.run_l_frame_list[self.run_index]
                 self.counter = 0           
 
+
         #Update coords of player on screen
         self.rect.x += dx
         self.rect.y += dy
@@ -159,12 +170,68 @@ class Player():
         elif dx < 0:
             self.rect = self.image_run_left.get_rect(topleft = (self.rect.x,self.rect.y))
             screen.blit(self.image_run_left,self.rect)
+        
+        pygame.draw.rect(screen, (255,255,255), self.rect, 2)
 
+class World():
+    def __init__(self,array):
+        self.world_tiles = []
+        # Generates a list of tuples to contain details regarding world tile images, as well as 
+        y_level = 0
+        for row in array:
+            x_level = 0
+            for tile in row:
+                if tile != 0:
+                    asset = pygame.image.load(f"img/t_assets/tile_{tile}.png")
+                    image = pygame.transform.scale(asset, (tilesize, tilesize))
+                    self.rect = image.get_rect()
+                    self.rect.x = x_level * tilesize
+                    self.rect.y = y_level * tilesize
+                    tile_data = (image, self.rect)
+                    self.world_tiles.append(tile_data)
+                x_level += 1
+            y_level += 1
 
+    def update(self):
+        for tile in self.world_tiles:
+            screen.blit(tile[0], tile[1])
 
 
 # Game Variables
 player = Player(0,0)
+world = World(
+[[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,4,5,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,4,5,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,3,4,5,0,0,0,0,0,0,0,0,0,3,4,5,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+[2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2],
+[2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2],
+[2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2]]
+)
+
+
+
+def linedraw():
+    """ Function to draw grid on screen. Optional"""
+    tilesize = 64
+    for x in range(0,30):
+        pygame.draw.line(screen,(0,0,0),(x*tilesize,0),(x*tilesize,screen_height))
+    for y in range(0,20):
+        pygame.draw.line(screen,(0,0,0),(0,y*tilesize),(screen_width,y*tilesize))
+        
 
 # Game Loop
 running = True
@@ -183,6 +250,10 @@ while running:
     # Screen Updates 
     screen.fill([255,255,255])
     screen.blit(s_img, (0,0))
+
+    # World Animations
+    linedraw()
+    world.update()
 
     # Animations / Characters    
     player.update()
